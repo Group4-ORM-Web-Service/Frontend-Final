@@ -1,7 +1,8 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import HomePage from '../screens/home/Home';
-import LoginPage from '../screens/authentication/Login';
-import RegisterPage from '../screens/authentication/Register';
+import HomePage from '../component/home/Home';
+import LoginPage from '../component/authentication/Login';
+import RegisterPage from '../component/authentication/Register';
+import ProductComponent from '../component/productComponent/productComponent';
 
 const Router = () => {
   return (
@@ -10,9 +11,9 @@ const Router = () => {
         <Route>
           <Route path='/' element={<LoginPage />} />
           <Route path='/register' element={<RegisterPage />} />
-        </Route>
+          </Route>
         <Route path='/home' element={<HomePage />}></Route>
-      </Routes>
+        <Route path='/products' element={<ProductComponent />} /></Routes>
     </BrowserRouter>
   );
 };
