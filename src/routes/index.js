@@ -3,6 +3,7 @@ import HomePage from '../component/home/Home';
 import LoginPage from '../component/authentication/Login';
 import RegisterPage from '../component/authentication/Register';
 import ProductComponent from '../component/productComponent/productComponent';
+import ProductDetailComponent from '../component/productDetailComponent/productDetailComponent';
 
 const Router = () => {
   return (
@@ -13,6 +14,7 @@ const Router = () => {
           <Route path='/register' element={<RegisterPage />} />
           </Route>
         <Route path='/home' element={<HomePage />}></Route>
+        <Route path='/products-detail/' element={<ProductDetailComponent />} />
         <Route path='/products' element={<ProductComponent />} /></Routes>
     </BrowserRouter>
   );

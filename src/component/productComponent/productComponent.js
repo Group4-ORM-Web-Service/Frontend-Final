@@ -18,6 +18,7 @@ import Slider from '@mui/material/Slider'
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -129,11 +130,18 @@ const ProductComponent = () => {
 export default ProductComponent;
 
 function AlignItemsList({ listItems }) {
+
+  const navigate = useNavigate();
+  const handleItemClick = (item) => {
+    // navigate(`/products-detail/${item.primary}`); // with name details itmes links
+    navigate(`/products-detail`, {state: {item}})
+
+  };
   return (
     <List className="align-items-list" sx={{ width: '100%' }}>
       {listItems.map((item, index) => (
         <React.Fragment key={index}>
-          <ListItem alignItems="flex-start">
+          <ListItem alignItems="flex-start" onClick={() => handleItemClick(item)} style={{ cursor: 'pointer'}}>
             <ListItemAvatar>
               <img alt={item.secondary.name} src={item.avatar} width={280} />
             </ListItemAvatar>
@@ -158,7 +166,6 @@ function AlignItemsList({ listItems }) {
                     <br />
                     {item.secondary.description}
                   </Typography>
-                  {/* {` — ${item.secondary.text}`} */}
                 </React.Fragment>
                 
               }
