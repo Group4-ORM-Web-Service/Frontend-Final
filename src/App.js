@@ -1,25 +1,19 @@
+/* eslint-disable no-unused-vars */
 import './App.css';
-import { ThemeProvider } from '@mui/material';
+import { Box, ThemeProvider } from '@mui/material';
 import customTheme from './them';
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Sidebar from './layouts/sidebar';
-import ProductPage from './screens/products/product';
+// import Sidebar from './layouts/sidebar';
+import RouteContainer from './routes';
+
 
 const App = () => {
+  console.log('location==>', location);
   return (
     <ThemeProvider theme={customTheme}>
-      <Router>
-      <Sidebar />
-      <div className="main">
-        <div className="main-content">
-          <Routes>
-            <Route path="/product" element={<ProductPage/>} />
-            {/* Add more routes here */}
-          </Routes>
-        </div>
-      </div>
-    </Router>
+      <Box bgcolor='white' width='100%' height='100%'>
+        <RouteContainer />
+      </Box>
     </ThemeProvider>
   );
 };
