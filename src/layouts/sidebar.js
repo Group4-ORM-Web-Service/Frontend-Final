@@ -19,22 +19,22 @@ const menuList = [
   {
     id: 1,
     name: 'Home',
-    screen: '/home',
+    screen: ROUTES_NAME.HOME,
   },
   {
     id: 2,
     name: 'Products',
-    screen: '/products',
+    screen: ROUTES_NAME.PRODUCTS,
   },
   {
     id: 3,
     name: 'Admin',
-    screen: '/admin',
+    screen: ROUTES_NAME.ADMIN,
   },
   {
     id: 4,
     name: 'Account',
-    screen: '/account',
+    screen: ROUTES_NAME.ACCOUNT,
   },
 ];
 
@@ -42,19 +42,23 @@ const settings = [
   {
     id: 1,
     name: 'Account',
-    screen: '/account',
+    screen: ROUTES_NAME.ACCOUNT,
   },
   {
     id: 2,
     name: 'Logout',
-    screen: '/',
+    screen: ROUTES_NAME.LOGIN,
   },
 ];
 
 import logo from '../images/logo.png';
+import { ROUTES_NAME } from '../constant/keyComponent';
+import { useAuth } from '../context/AuthContext';
 
 const Sidebar = ({ pageName = 'Home' }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
   const [isOpen, setIsOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -72,10 +76,15 @@ const Sidebar = ({ pageName = 'Home' }) => {
 
   const handleClockRightMenu = React.useCallback(
     (item) => {
-      navigate(item.screen, { state: { item } });
+      if (item.name === 'Logout') {
+        logout();
+      } else {
+        navigate(item.screen, { state: { item } });
+      }
+
       handleCloseUserMenu();
     },
-    [handleCloseUserMenu, navigate],
+    [handleCloseUserMenu, logout, navigate],
   );
 
   return (

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+/* eslint-disable no-unused-vars */
+import React, { useEffect, useState } from 'react';
 import {
   Grid,
   Paper,
@@ -11,11 +12,17 @@ import {
   FormControlLabel,
   Checkbox,
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import '../../styles/Login.css';
+import apiClient from '../../api/axios';
+import { ROUTES_NAME, STORAGE_KEY } from '../../constant/keyComponent';
+import { useAuth } from '../../context/AuthContext';
 
 const LoginForm = () => {
+  const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -35,15 +42,30 @@ const LoginForm = () => {
   /**
    * Handle login submit form
    */
-  const handleLogin = () => {
+  const handleLogin = React.useCallback(async () => {
     if (!validateEmail(email)) {
       setEmailError('Invalid email format!');
     } else {
-      setEmailError('');
-      // Add your login logic here
-      console.log('Logging in with email:', email, 'and password:', password);
+      apiClient
+        .post('/login', { email, password })
+        .then((response) => {
+          if (response.data.message) {
+            login(response.data?.token);
+            localStorage.setItem(STORAGE_KEY.USER_DATA, JSON.stringify(response.data?.user));
+            console.log('Login successful:');
+            navigate(ROUTES_NAME.HOME, { replace: true });
+            setEmailError('');
+          } else {
+            console.log('Unexpected response format:', response);
+            setEmailError('Unexpected response format');
+          }
+        })
+        .catch((error) => {
+          console.log('Error:', error?.response?.data?.message || error.message);
+          setEmailError(error?.response?.data?.message || 'An error occurred');
+        });
     }
-  };
+  }, [email, login, navigate, password]);
 
   /**
    * Show/Hide password
@@ -66,6 +88,12 @@ const LoginForm = () => {
   const handleRememberMeChange = (event) => {
     setRememberMe(event.target.checked);
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(ROUTES_NAME.HOME, { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   return (
     <div>
