@@ -1,8 +1,9 @@
 /* eslint-disable no-unused-vars */
-import React from 'react';
+import React, { useEffect } from 'react';
 import FilterByItems from './components/FilterByItems';
 import ProductList from './components/ProductList';
 import Sidebar from '../../layouts/sidebar';
+import { Box } from '@mui/material';
 
 const ProductPage = () => {
   const [listCheckBoxItems, setListCheckBoxItems] = React.useState([
@@ -96,8 +97,9 @@ const ProductPage = () => {
       },
     },
   ]);
+
   return (
-    <>
+    <Box bgcolor='transparent'>
       <Sidebar pageName='Products' />
       <div className='product-component' style={{ marginTop: 50 }}>
         <div className='container-left-cell'>
@@ -107,7 +109,7 @@ const ProductPage = () => {
           <FilterByItems listItems={listCheckBoxItems} />
         </div>
       </div>
-    </>
+    </Box>
   );
 };
 

@@ -10,4 +10,7 @@ export default {
 
   // API
   apiBaseUrl: 'http://localhost:8080/api',
+
+  // Country API
+  apiCountry: 'https://countriesnow.space/api/v0.1/countries',
 };

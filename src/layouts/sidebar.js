@@ -54,10 +54,12 @@ const settings = [
 import logo from '../images/logo.png';
 import { ROUTES_NAME } from '../constant/keyComponent';
 import { useAuth } from '../context/AuthContext';
+import { useAppContext } from '../context/AppContext';
 
 const Sidebar = ({ pageName = 'Home' }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { dispatchApp } = useAppContext();
 
   const [isOpen, setIsOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
