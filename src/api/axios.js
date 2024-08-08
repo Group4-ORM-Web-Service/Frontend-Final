@@ -26,4 +26,12 @@ apiClient.interceptors.request.use(
   },
 );
 
+export const apiCountryClient = axios.create({
+  baseURL: config.apiCountry,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
 export default apiClient;

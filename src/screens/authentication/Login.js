@@ -9,8 +9,7 @@ import {
   OutlinedInput,
   InputAdornment,
   IconButton,
-  FormControlLabel,
-  Checkbox,
+  Typography,
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -18,26 +17,33 @@ import '../../styles/Login.css';
 import apiClient from '../../api/axios';
 import { ROUTES_NAME, STORAGE_KEY } from '../../constant/keyComponent';
 import { useAuth } from '../../context/AuthContext';
+import { useAppContext } from '../../context/AppContext';
 
 const LoginForm = () => {
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
+  const { appState, dispatchApp } = useAppContext();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(ROUTES_NAME.HOME, { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   /**
    * Regular expression for basic email validation
    * @param {*} email
    * @returns message
    */
-  const validateEmail = (email) => {
+  const validateEmail = React.useCallback((email) => {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
-  };
+  }, []);
 
   /**
    * Handle login submit form
@@ -65,36 +71,25 @@ const LoginForm = () => {
           setEmailError(error?.response?.data?.message || 'An error occurred');
         });
     }
-  }, [email, login, navigate, password]);
+  }, [email, login, navigate, password, validateEmail]);
 
   /**
    * Show/Hide password
    * @returns html
    */
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowPassword = React.useCallback(() => setShowPassword((show) => !show), []);
 
   /**
    * Prevent mouse down password
    * @param {*} event
    */
-  const handleMouseDownPassword = (event) => {
+  const handleMouseDownPassword = React.useCallback((event) => {
     event.preventDefault();
-  };
+  }, []);
 
-  /**
-   * Remeber user login
-   * @param {*} event
-   */
-  const handleRememberMeChange = (event) => {
-    setRememberMe(event.target.checked);
-  };
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate(ROUTES_NAME.HOME, { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
-
+  if (isAuthenticated) {
+    return <></>;
+  }
   return (
     <div>
       <Grid
@@ -106,7 +101,9 @@ const LoginForm = () => {
       >
         <Grid>
           <Paper className='paper' style={{ width: '400px' }}>
-            <h1 className='text-login'>Sign in</h1>
+            <Typography variant='h4' color='blue.800' mt='16px' mb="24px">
+              Sign in
+            </Typography>
 
             {/* email */}
             <InputLabel htmlFor='email-input' sx={{ color: '#666666', fontWeight: 550 }}>
@@ -161,13 +158,6 @@ const LoginForm = () => {
                   </IconButton>
                 </InputAdornment>
               }
-            />
-
-            {/* remember me */}
-            <FormControlLabel
-              control={<Checkbox checked={rememberMe} onChange={handleRememberMeChange} />}
-              label='Remember Me'
-              sx={{ color: '#666666', fontWeight: 600 }}
             />
 
             {/* btn submit */}

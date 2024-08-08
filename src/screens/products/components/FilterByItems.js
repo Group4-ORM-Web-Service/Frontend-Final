@@ -17,7 +17,7 @@ import Button from '@mui/material/Button';
 const FilterByItems = ({ listItems }) => {
   return (
     <>
-      <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+      <Box sx={{ width: '100%', maxWidth: 360, paddingY: '16px' }}>
         <nav aria-label='main mailbox folders'>
           <h3>Related iterms</h3>
           <List>
@@ -45,7 +45,12 @@ const FilterByItems = ({ listItems }) => {
         </nav>
       </Box>
       <Divider />
-      <nav aria-label='secondary mailbox folders'>
+      <nav
+        aria-label='secondary mailbox folders'
+        style={{
+          paddingTop: '16px',
+        }}
+      >
         <h3>Filter by</h3>
         <List>
           {listItems.map((item, index) => (
@@ -59,7 +64,12 @@ const FilterByItems = ({ listItems }) => {
         </List>
       </nav>
       <Divider />
-      <nav aria-label='secondary mailbox folders'>
+      <nav
+        aria-label='secondary mailbox folders'
+        style={{
+          paddingTop: '16px',
+        }}
+      >
         <h3>Gender</h3>
         <FormControl>
           <RadioGroup>
@@ -92,7 +102,12 @@ const FilterByItems = ({ listItems }) => {
       </nav>
 
       <Divider />
-      <nav aria-label='secondary mailbox folders'>
+      <nav
+        aria-label='secondary mailbox folders'
+        style={{
+          paddingTop: '16px',
+        }}
+      >
         <h3>Price</h3>
         <Box sx={{ width: { xs: '90%' }, ml: { xs: '10px' } }}>
           <Slider getAriaLabel={() => 'Minimum distance'} min={10} max={100} step={1} disableSwap />

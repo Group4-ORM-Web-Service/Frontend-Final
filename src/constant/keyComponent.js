@@ -1,6 +1,7 @@
 export const STORAGE_KEY = {
   USER_TOKEN: 'userToken',
   USER_DATA: 'userData',
+  CURRENT_PAGE: 'currentPage',
 };
 
 export const ROUTES_NAME = {
