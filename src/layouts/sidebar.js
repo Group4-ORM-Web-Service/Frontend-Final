@@ -6,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import {
   Avatar,
   Box,
-  Button,
+  ButtonBase,
   IconButton,
   Menu,
   MenuItem,
@@ -52,14 +52,17 @@ const settings = [
 ];
 
 import logo from '../images/logo.png';
-import { ROUTES_NAME } from '../constant/keyComponent';
+import { ROUTES_NAME, STORAGE_KEY } from '../constant/keyComponent';
 import { useAuth } from '../context/AuthContext';
 import { useAppContext } from '../context/AppContext';
+import { ShoppingCart } from '@mui/icons-material';
+import { setOpenShopCard } from '../store/actions/AppAction';
+import ShopCardComponent from '../component/Card/ShoppingList';
 
 const Sidebar = ({ pageName = 'Home' }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const { dispatchApp } = useAppContext();
+  const { appState, dispatchApp } = useAppContext();
 
   const [isOpen, setIsOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -89,6 +92,12 @@ const Sidebar = ({ pageName = 'Home' }) => {
     [handleCloseUserMenu, logout, navigate],
   );
 
+  const handleClick = React.useCallback(() => {
+    dispatchApp(setOpenShopCard(!appState?.isOpenCard));
+  }, [appState?.isOpenCard, dispatchApp]);
+
+  const numberOfItems = React.useMemo(() => appState?.items?.length, [appState?.items?.length]);
+
   return (
     <Box
       className='container-fluid'
@@ -105,8 +114,37 @@ const Sidebar = ({ pageName = 'Home' }) => {
               <DehazeIcon style={{ fontSize: 15 }} />
             </div>
           </div>
+          <ButtonBase
+            style={{
+              marginLeft: 'auto',
+              marginRight: '32px',
+              width: 40,
+              height: 40,
+            }}
+            onClick={handleClick}
+          >
+            <Typography
+              textAlign='center'
+              color='red.900'
+              position='absolute'
+              fontWeight='800'
+              top='0'
+              ml='20px'
+              bgcolor='grey.50'
+              boxShadow={4}
+              borderRadius={50}
+              minWidth={20}
+              width='auto'
+              height='auto'
+              fontSize='12px'
+              justifyContent='center'
+            >
+              {numberOfItems}
+            </Typography>
+            <ShoppingCart color='info' />
+          </ButtonBase>
           <Tooltip title='Open settings' boxShadow={4}>
-            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, boxShadow: 2 }}>
               <Avatar alt='Remy Sharp' src={logo} />
             </IconButton>
           </Tooltip>
@@ -134,6 +172,7 @@ const Sidebar = ({ pageName = 'Home' }) => {
           </Menu>
         </div>
       </nav>
+      <ShopCardComponent />
       <div className={`sidebar ${isOpen ? 'active' : ''}`}>
         <div className='sd-header'>
           <h4 className='mb-0'>ShopCart</h4>
