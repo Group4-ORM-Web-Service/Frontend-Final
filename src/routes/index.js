@@ -7,6 +7,7 @@ import AdminPage from '../screens/admin/productTable';
 import ProductPage from '../screens/products';
 import React from 'react';
 import ProtectedRoute from './ProtectedRoute';
+import CardList from '../screens/Card/List';
 import { ROUTES_NAME } from '../constant/keyComponent';
 
 const RouteContainer = () => {
@@ -27,6 +28,8 @@ const RouteContainer = () => {
           </Route>
         </Route>
 
+        <Route path={ROUTES_NAME.CARD_LIST} element={<CardList />} />
+        
         {/* Redirect to home if no route matches */}
         <Route path='*' element={<Navigate to={ROUTES_NAME.LOGIN} />} />
       </Routes>

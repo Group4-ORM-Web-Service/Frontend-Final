@@ -12,4 +12,5 @@ export const ROUTES_NAME = {
   LOGIN: '/',
   REGISTER: '/register',
   PRODUCT_DETAIL: '/products-detail',
+  CARD_LIST: '/card',
 };
