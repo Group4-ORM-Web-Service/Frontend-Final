@@ -3,7 +3,7 @@ import RegisterPage from '../screens/authentication/Register';
 import LoginPage from '../screens/authentication/Login';
 import HomePage from '../screens/home';
 import ProductDetailPage from '../screens/productDetail/productDetail';
-import AdminPage from '../screens/admin/productTable';
+import AdminPage from '../screens/admin/index'
 import ProductPage from '../screens/products';
 import React from 'react';
 
@@ -19,7 +19,7 @@ const RouteContainer = () => {
         <Route path='/products' element={<ProductPage />} />
         <Route path='/products-detail' element={<ProductDetailPage />} />
         <Route path='/admin' element={<AdminPage />}>
-          <Route path='/admin/product' element={<AdminPage />} />
+          <Route path='/admin' element={<AdminPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
