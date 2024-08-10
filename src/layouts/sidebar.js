@@ -26,16 +26,6 @@ const menuList = [
     name: 'Products',
     screen: ROUTES_NAME.PRODUCTS,
   },
-  {
-    id: 3,
-    name: 'Admin',
-    screen: ROUTES_NAME.ADMIN,
-  },
-  {
-    id: 4,
-    name: 'Account',
-    screen: ROUTES_NAME.ACCOUNT,
-  },
 ];
 
 const settings = [
@@ -52,7 +42,7 @@ const settings = [
 ];
 
 import logo from '../images/logo.png';
-import { ROUTES_NAME, STORAGE_KEY } from '../constant/keyComponent';
+import { ROUTES_NAME, STORAGE_KEY, USER_ROLES } from '../constant/keyComponent';
 import { useAuth } from '../context/AuthContext';
 import { useAppContext } from '../context/AppContext';
 import { ShoppingCart } from '@mui/icons-material';
@@ -66,6 +56,19 @@ const Sidebar = ({ pageName = 'Home' }) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+  const pageMenus = React.useMemo(() => {
+    const menus = [...menuList];
+    const user = JSON.parse(localStorage.getItem(STORAGE_KEY.USER_DATA));
+    if (user?.role === USER_ROLES.ADMIN) {
+      menus.push({
+        id: 3,
+        name: 'Admin',
+        screen: ROUTES_NAME.ADMIN,
+      });
+    }
+    return menus;
+  }, []);
 
   const handleOpenUserMenu = React.useCallback((event) => {
     setAnchorElUser(event?.currentTarget);
@@ -110,9 +113,31 @@ const Sidebar = ({ pageName = 'Home' }) => {
       <nav className='navbar navbar-expand-lg navbar-light'>
         <div className='container-fluid p-2'>
           <div className='form-inline'>
-            <div className='btn btn-primary' onClick={toggleSidebar}>
+            <Tooltip title='Open settings' boxShadow={4}>
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, boxShadow: 2 }}>
+                <Avatar alt='Remy Sharp' src={logo} />
+              </IconButton>
+            </Tooltip>
+            {/* <div className='btn btn-primary' onClick={toggleSidebar}>
               <DehazeIcon style={{ fontSize: 15 }} />
-            </div>
+            </div> */}
+            <Box display='flex' mx='60px'>
+              {pageMenus.map((page) => (
+                <MenuItem
+                  key={page.id}
+                  selected={pageName === page.name}
+                  onClick={() => handleClockRightMenu(page)}
+                  sx={{
+                    mx: '16px',
+                    borderRadius: 25,
+                  }}
+                >
+                  <Typography textAlign='center' py='8px'>
+                    {page.name}
+                  </Typography>
+                </MenuItem>
+              ))}
+            </Box>
           </div>
           <ButtonBase
             style={{
@@ -143,11 +168,7 @@ const Sidebar = ({ pageName = 'Home' }) => {
             </Typography>
             <ShoppingCart color='info' />
           </ButtonBase>
-          <Tooltip title='Open settings' boxShadow={4}>
-            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, boxShadow: 2 }}>
-              <Avatar alt='Remy Sharp' src={logo} />
-            </IconButton>
-          </Tooltip>
+
           <Menu
             sx={{ mt: '45px' }}
             id='menu-appbar'
@@ -173,7 +194,7 @@ const Sidebar = ({ pageName = 'Home' }) => {
         </div>
       </nav>
       <ShopCardComponent />
-      <div className={`sidebar ${isOpen ? 'active' : ''}`}>
+      {/* <div className={`sidebar ${isOpen ? 'active' : ''}`}>
         <div className='sd-header'>
           <h4 className='mb-0'>ShopCart</h4>
           <div className='btn btn-primary' onClick={toggleSidebar}>
@@ -194,7 +215,7 @@ const Sidebar = ({ pageName = 'Home' }) => {
           ))}
         </div>
       </div>
-      <div className={`sidebar-overlay ${isOpen ? 'active' : ''}`} onClick={toggleSidebar}></div>
+      <div className={`sidebar-overlay ${isOpen ? 'active' : ''}`} onClick={toggleSidebar}></div> */}
     </Box>
   );
 };

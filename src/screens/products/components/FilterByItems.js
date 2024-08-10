@@ -6,9 +6,7 @@ import Divider from '@mui/material/Divider';
 import { Box, Checkbox, FormControlLabel } from '@mui/material';
 import '../../../styles/product.css';
 import ListItemButton from '@mui/material/ListItemButton';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControl from '@mui/material/FormControl';
+
 import Slider from '@mui/material/Slider';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
@@ -64,43 +62,6 @@ const FilterByItems = ({ listItems }) => {
         </List>
       </nav>
       <Divider />
-      <nav
-        aria-label='secondary mailbox folders'
-        style={{
-          paddingTop: '16px',
-        }}
-      >
-        <h3>Gender</h3>
-        <FormControl>
-          <RadioGroup>
-            <FormControlLabel
-              style={{ marginLeft: '10px' }}
-              value='condition'
-              control={<Radio />}
-              label='Condition'
-            />
-            <FormControlLabel
-              style={{ marginLeft: '10px' }}
-              value='quality'
-              control={<Radio />}
-              label='Quality'
-            />
-            <FormControlLabel
-              style={{ marginLeft: '10px' }}
-              value='recommend'
-              control={<Radio />}
-              label='Recommend'
-            />
-            <FormControlLabel
-              style={{ marginLeft: '10px' }}
-              value='random'
-              control={<Radio />}
-              label='Random'
-            />
-          </RadioGroup>
-        </FormControl>
-      </nav>
-
       <Divider />
       <nav
         aria-label='secondary mailbox folders'
