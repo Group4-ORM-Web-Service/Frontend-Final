@@ -97,9 +97,9 @@ const ProductPage = () => {
         if (response?.data) {
           const products = response?.data?.products;
           setListItems([...products, ...listItems]);
-          console.log('Register successful:', response.data?.products);
+          console.log('Get products successful:');
         } else {
-          console.log('Unexpected response format:', response);
+          console.log('Unexpected response format:');
         }
       })
       .catch((error) => {

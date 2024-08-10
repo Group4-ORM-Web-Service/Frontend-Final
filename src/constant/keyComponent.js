@@ -14,3 +14,8 @@ export const ROUTES_NAME = {
   REGISTER: '/register',
   PRODUCT_DETAIL: '/product-detail',
 };
+
+export const USER_ROLES = {
+  USER: 'User',
+  ADMIN: 'Admin',
+};
