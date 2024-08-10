@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+.navbar {
+    padding: 20px 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: auto;
+    width: 80%;
+}
+
+.navbar .logo {
+    height: 100px;
+}
+
+.navbar-menu {
+    display: flex;
+    list-style-type: none;
+    gap: 30px;
+    color: cadetblue;
+    font-size: 20px;
+    font-family: outfit;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.button-sumbit {
+    font-family: outfit;
+    background: transparent;
+    font-size: 16px;
+    color:  cadetblue;
+    border: 1px solid black;
+    padding: 10px 30px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.3s;
+    /* width: 100px; */
+    height: 40px;
+}
+
+.button-signin {
+    background: transparent;
+    font-size: 16px;
+    color:  cadetblue;
+    border: 1px solid black;
+    padding: 10px 30px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.3s;
+    /* width: 140px; */
+    height: 40px;
+}
+
+.navbar button:hover {
+    background-color: rgb(215, 250, 247);
+}
+
+.navbar .active {
+    padding-bottom: 2px;
+    border-bottom: 2px solid  cadetblue;
+}
+
+.navbar li {
+    cursor: pointer;
+}
+
+.navbar-search-icon input[type="text"] {
+    width: 40%;
+    margin: 10px;
+    padding: 10px ;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    border-radius: 50px;
+    background-color: rgba(255, 255, 255, 0.5);
+    font-size: 18px;
+    font-family: outfit;
+    height: 20px;
+    margin-left: 20px;
+
+}
+
+.navbar-search-icon {
+    position: relative;
+    cursor: pointer;
+}
+
+.navbar-search-icon .icon-bag {
+    align-items: center;
+    gap: 40px;
+    padding-left: 10px;
+    cursor: pointer;
+}
+
