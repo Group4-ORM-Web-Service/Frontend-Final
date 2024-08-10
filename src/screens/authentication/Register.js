@@ -1,62 +1,65 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
-import {
-  Grid,
-  Paper,
-  TextField,
-  Button,
-  InputLabel,
-  Box,
-  Checkbox,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  Select,
-  MenuItem,
-  FormControl,
-} from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Grid, Paper, TextField, Button, InputLabel, Box, Typography } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 import '../../styles/Register.css';
+import apiClient, { apiCountryClient } from '../../api/axios';
+import SelectOptions from './components/SelectBox';
+import { ROUTES_NAME, STORAGE_KEY } from '../../constant/keyComponent';
+import { useAuth } from '../../context/AuthContext';
+import { isEmpty } from 'lodash';
 
 const RegisterForm = () => {
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    userType: '',
+    username: '',
     country: '',
     city: '',
     email: '',
-    phoneNumber: '',
+    phone: '',
     password: '',
     confirmPassword: '',
   });
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [countries, setCountries] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate(ROUTES_NAME.HOME, { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   /**
    * Handle change data input
    * @param {*} e
    */
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    // Special case for phone number to format it
-    if (name === 'phoneNumber') {
-      let input = value.replace(/\D/g, ''); // Remove non-numeric characters
-      if (input.length > 10) {
-        input = input.substring(0, 10); // Limit input to 10 characters
+  const handleChange = React.useCallback(
+    (e) => {
+      const { name, value } = e.target;
+      // Special case for phone number to format it
+      if (name === 'phone') {
+        let input = value.replace(/\D/g, ''); // Remove non-numeric characters
+        if (input.length > 10) {
+          input = input.substring(0, 10); // Limit input to 10 characters
+        }
+        const formattedPhoneNumber = input.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+        setFormData({
+          ...formData,
+          [name]: formattedPhoneNumber,
+        });
+      } else {
+        setFormData({
+          ...formData,
+          [name]: value,
+        });
       }
-      const formattedPhoneNumber = input.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
-      setFormData({
-        ...formData,
-        [name]: formattedPhoneNumber,
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
-  };
+    },
+    [formData],
+  );
 
   /**
    * Validate email format
@@ -73,28 +76,85 @@ const RegisterForm = () => {
    * @param {*} e
    * @returns
    */
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = React.useCallback(
+    (e) => {
+      e.preventDefault();
 
-    // if invalid email format
-    if (!validateEmail(formData.email)) {
-      setEmailError('Invalid email format!');
-      return;
-    } else {
-      setEmailError('');
+      // if invalid email format
+      if (!validateEmail(formData.email)) {
+        setEmailError('Invalid email format!');
+        return;
+      }
+      // if password not match
+      if (isEmpty(formData.password) || formData.password !== formData.confirmPassword) {
+        setPasswordError('Passwords do not match!');
+        return;
+      }
+      apiClient
+        .post('/register', { ...formData, address: `${formData?.country} - ${formData?.city}` })
+        .then((response) => {
+          if (response.data.message) {
+            login(response.data?.token);
+            localStorage.setItem(STORAGE_KEY.USER_DATA, JSON.stringify(response.data?.user));
+            console.log('Register successful:');
+            navigate(ROUTES_NAME.HOME, { replace: true });
+            setEmailError('');
+            setPasswordError('');
+          } else {
+            console.log('Unexpected response format:', response);
+            setEmailError('Unexpected response format');
+          }
+        })
+        .catch((error) => {
+          console.log('Error:', error?.response?.data?.message || error.message);
+          setEmailError(error?.response?.data?.message || 'An error occurred');
+        });
+
+      // You can add additional validation logic here
+      console.log(formData);
+    },
+    [formData, login, navigate],
+  );
+
+  const handleCountryChange = React.useCallback(
+    (event, value) => {
+      setSelectedCountry(value);
+      setFormData({
+        ...formData,
+        country: value?.country,
+      });
+    },
+    [formData],
+  );
+
+  const handleCityChange = React.useCallback(
+    (event, value) => {
+      setFormData({
+        ...formData,
+        city: value,
+      });
+    },
+    [formData],
+  );
+
+  const fetchCountriesWithCities = React.useCallback(async () => {
+    try {
+      const response = await apiCountryClient.get();
+      if (response?.data) {
+        setCountries(response?.data?.data);
+      }
+    } catch (error) {
+      console.error('Error fetching countries and cities:', error);
     }
+  }, []);
 
-    // if password not match
-    if (formData.password !== formData.confirmPassword) {
-      setPasswordError('Passwords do not match!');
-      return;
-    } else {
-      setPasswordError('');
-    }
+  React.useEffect(() => {
+    fetchCountriesWithCities();
+  }, [fetchCountriesWithCities]);
 
-    // You can add additional validation logic here
-    console.log(formData);
-  };
+  if (isAuthenticated) {
+    return <></>;
+  }
 
   return (
     <div>
@@ -103,98 +163,55 @@ const RegisterForm = () => {
         direction='column'
         justifyContent='center'
         alignItems='center'
-        style={{ minHeight: '100vh', backgroundColor: 'transparent' }}
+        style={{ minHeight: '100vh' }}
       >
         <Grid>
           <Box component='form' onSubmit={handleSubmit} noValidate autoComplete='off'>
-            <Paper className='paper' style={{ width: '470px' }}>
-              <h1>Create account</h1>
-
-              <Grid sx={{ mt: '1rem' }} container justifyContent='space-between'>
-                <Grid item xs={6}>
-                  <InputLabel htmlFor='firstName' sx={{ color: '#666666', fontWeight: 550 }}>
-                    First Name
-                  </InputLabel>
-                  <TextField
-                    id='firstName'
-                    name='firstName'
-                    size='small'
-                    required
-                    value={formData.firstName}
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <InputLabel htmlFor='lastName' sx={{ color: '#666666', fontWeight: 550 }}>
-                    Last Name
-                  </InputLabel>
-                  <TextField
-                    id='lastName'
-                    name='lastName'
-                    size='small'
-                    required
-                    value={formData.lastName}
-                    onChange={handleChange}
-                  />
-                </Grid>
-              </Grid>
-
-              <RadioGroup
-                row
-                aria-labelledby='userType-label'
-                name='userType'
-                sx={{ mt: 0.5 }}
-                value={formData.userType}
+            <Paper className='paper' style={{ width: '470px', paddingTop: '16px' }}>
+              <Typography variant='h4' color='blue.800' py='12px'>
+                Create account
+              </Typography>
+              <InputLabel htmlFor='email' sx={{ mt: 1.5, color: '#666666', fontWeight: 550 }}>
+                Username
+              </InputLabel>
+              <TextField
+                id='username'
+                name='username'
+                type='text'
+                label='username'
+                value={formData.username}
                 onChange={handleChange}
-              >
-                <FormControlLabel value='buyer' control={<Radio />} label='Buyer' />
-                <FormControlLabel value='seller' control={<Radio />} label='Seller' />
-                <FormControlLabel value='both' control={<Radio />} label='Both' />
-              </RadioGroup>
-
-              <Grid container justifyContent='space-between'>
+                size='small'
+                fullWidth
+                required
+              />
+              <Grid container justifyContent='space-between' my='12px'>
                 <Grid item xs={6}>
                   <InputLabel id='country-select-label' sx={{ color: '#666666', fontWeight: 550 }}>
                     Country
                   </InputLabel>
-                  <FormControl sx={{ minWidth: 220 }}>
-                    <Select
-                      labelId='country-select-label'
-                      id='country'
-                      name='country'
-                      size='small'
-                      value={formData.country}
-                      onChange={handleChange}
-                    >
-                      <MenuItem value='option1'>Option 1</MenuItem>
-                      <MenuItem value='option2'>Option 2</MenuItem>
-                      <MenuItem value='option3'>Option 3</MenuItem>
-                    </Select>
-                  </FormControl>
+                  <SelectOptions data={countries} onChange={handleCountryChange} xs={12} />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={5.5}>
                   <InputLabel htmlFor='city' sx={{ color: '#666666', fontWeight: 550 }}>
                     City
                   </InputLabel>
-                  <TextField
-                    id='city'
-                    name='city'
-                    size='small'
-                    fullWidth
-                    required
-                    value={formData.city}
-                    onChange={handleChange}
+                  <SelectOptions
+                    data={selectedCountry?.cities || []}
+                    onChange={handleCityChange}
+                    xs={12}
+                    label='city'
                   />
                 </Grid>
               </Grid>
 
-              <InputLabel htmlFor='phoneNumber' sx={{ mt: 1.5, color: '#666666', fontWeight: 550 }}>
+              <InputLabel htmlFor='phone' sx={{ mt: 1.5, color: '#666666', fontWeight: 550 }}>
                 Phone number
               </InputLabel>
               <TextField
-                id='phoneNumber'
-                name='phoneNumber'
-                value={formData.phoneNumber}
+                id='phone'
+                name='phone'
+                value={formData.phone}
                 onChange={handleChange}
                 size='small'
                 fullWidth
@@ -244,7 +261,7 @@ const RegisterForm = () => {
                 {passwordError && <span style={{ color: 'red' }}>{passwordError}</span>}
               </Grid>
 
-              <Grid container sx={{ mt: '1rem' }}>
+              <Grid container sx={{ my: '16px' }}>
                 <Grid item>
                   <Button
                     type='submit'
@@ -254,13 +271,6 @@ const RegisterForm = () => {
                   >
                     Register Now
                   </Button>
-                </Grid>
-                <Grid item>
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label='I agree with Term and Conditions'
-                    sx={{ color: '#666666', fontWeight: 600, ml: 1 }}
-                  />
                 </Grid>
               </Grid>
 

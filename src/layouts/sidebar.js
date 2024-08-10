@@ -6,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import {
   Avatar,
   Box,
-  Button,
+  ButtonBase,
   IconButton,
   Menu,
   MenuItem,
@@ -19,22 +19,22 @@ const menuList = [
   {
     id: 1,
     name: 'Home',
-    screen: '/home',
+    screen: ROUTES_NAME.HOME,
   },
   {
     id: 2,
     name: 'Products',
-    screen: '/products',
+    screen: ROUTES_NAME.PRODUCTS,
   },
   {
     id: 3,
     name: 'Admin',
-    screen: '/admin',
+    screen: ROUTES_NAME.ADMIN,
   },
   {
     id: 4,
     name: 'Account',
-    screen: '/account',
+    screen: ROUTES_NAME.ACCOUNT,
   },
 ];
 
@@ -42,19 +42,28 @@ const settings = [
   {
     id: 1,
     name: 'Account',
-    screen: '/account',
+    screen: ROUTES_NAME.ACCOUNT,
   },
   {
     id: 2,
     name: 'Logout',
-    screen: '/',
+    screen: ROUTES_NAME.LOGIN,
   },
 ];
 
 import logo from '../images/logo.png';
+import { ROUTES_NAME, STORAGE_KEY } from '../constant/keyComponent';
+import { useAuth } from '../context/AuthContext';
+import { useAppContext } from '../context/AppContext';
+import { ShoppingCart } from '@mui/icons-material';
+import { setOpenShopCard } from '../store/actions/AppAction';
+import ShopCardComponent from '../component/Card/ShoppingList';
 
 const Sidebar = ({ pageName = 'Home' }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+  const { appState, dispatchApp } = useAppContext();
+
   const [isOpen, setIsOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -72,11 +81,22 @@ const Sidebar = ({ pageName = 'Home' }) => {
 
   const handleClockRightMenu = React.useCallback(
     (item) => {
-      navigate(item.screen, { state: { item } });
+      if (item.name === 'Logout') {
+        logout();
+      } else {
+        navigate(item.screen, { state: { item } });
+      }
+
       handleCloseUserMenu();
     },
-    [handleCloseUserMenu, navigate],
+    [handleCloseUserMenu, logout, navigate],
   );
+
+  const handleClick = React.useCallback(() => {
+    dispatchApp(setOpenShopCard(!appState?.isOpenCard));
+  }, [appState?.isOpenCard, dispatchApp]);
+
+  const numberOfItems = React.useMemo(() => appState?.items?.length, [appState?.items?.length]);
 
   return (
     <Box
@@ -94,8 +114,37 @@ const Sidebar = ({ pageName = 'Home' }) => {
               <DehazeIcon style={{ fontSize: 15 }} />
             </div>
           </div>
+          <ButtonBase
+            style={{
+              marginLeft: 'auto',
+              marginRight: '32px',
+              width: 40,
+              height: 40,
+            }}
+            onClick={handleClick}
+          >
+            <Typography
+              textAlign='center'
+              color='red.900'
+              position='absolute'
+              fontWeight='800'
+              top='0'
+              ml='20px'
+              bgcolor='grey.50'
+              boxShadow={4}
+              borderRadius={50}
+              minWidth={20}
+              width='auto'
+              height='auto'
+              fontSize='12px'
+              justifyContent='center'
+            >
+              {numberOfItems}
+            </Typography>
+            <ShoppingCart color='info' />
+          </ButtonBase>
           <Tooltip title='Open settings' boxShadow={4}>
-            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, boxShadow: 2 }}>
               <Avatar alt='Remy Sharp' src={logo} />
             </IconButton>
           </Tooltip>
@@ -123,6 +172,7 @@ const Sidebar = ({ pageName = 'Home' }) => {
           </Menu>
         </div>
       </nav>
+      <ShopCardComponent />
       <div className={`sidebar ${isOpen ? 'active' : ''}`}>
         <div className='sd-header'>
           <h4 className='mb-0'>ShopCart</h4>
