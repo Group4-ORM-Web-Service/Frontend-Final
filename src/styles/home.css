@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+.title-container h2 {
+  display: flex;
+  justify-content: space-between;
+  width: 20%;
+  /* padding-left: 10%; */
+  margin-top: 32px;
+}
+.main-container {
+  margin: 20px auto;
+  /* background-color: #8e5f5f; */
+  background-size: contain;
+  position: relative;
+  align-items: center;
+  padding: 10px;
+  width: 80%;
+  padding: rem;
+  bottom: auto;
+}
+/* .card-container {
+    display: flex;
+    list-style-type: none;
+    gap: 10px;
+    width: 20%;
+    padding: auto;
+    font-size: 25px;
+    font-family: outfit;
+
+    .contaner-img {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px 0px;
+        width: 30%;
+        height: 30%;
+        margin: auto;
+        align-items: center;
+    }
+}
+
+.contaner-img {
+    width: 30%;
+}
+ */
+
+.card-container {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 2rem;
+}
+
+.card-item {
+  max-width: 345px;
+  cursor: pointer;
+  box-shadow: 6px;
+}
+
+.container-img {
+  display: flex;
+  justify-content: space-between;
+  object-fit: cover;
+  height: 140px;
+  width: 140px;
+  padding: 10px;
+  margin: auto;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
