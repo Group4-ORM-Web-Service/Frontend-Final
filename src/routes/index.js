@@ -2,8 +2,9 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import RegisterPage from '../screens/authentication/Register';
 import LoginPage from '../screens/authentication/Login';
 import HomePage from '../screens/home';
+
+import AdminPage from '../screens/admin/index'
 import ProductDetailPage from '../screens/productDetail/index';
-import AdminPage from '../screens/admin/productTable';
 import ProductPage from '../screens/products';
 import React from 'react';
 import ProtectedRoute from './ProtectedRoute';
@@ -13,6 +14,7 @@ const RouteContainer = () => {
   return (
     <BrowserRouter>
       <Routes>
+    
         {/* Public Routes */}
         <Route path={ROUTES_NAME.LOGIN} element={<LoginPage />} />
         <Route path={ROUTES_NAME.REGISTER} element={<RegisterPage />} />

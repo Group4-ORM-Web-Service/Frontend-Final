@@ -1,25 +1,41 @@
-
-.tables{
-  padding-top: 10px;
-    .name{
-      border-bottom: 1px dotted #ccc;
-      cursor: pointer;
-
-    }
-    thead{
-      background: rgb(95, 155, 233);
-      tr{
-        color: white
-      }
-    }
-  }
-
-.btn-action{
-  text-align: center;
-}
-
-.content{
+.product-list {
   display: flex;
   justify-content: space-between;
-  padding: auto;
+}
+
+.product-table{
+  width: 60%;
+  padding-right: 15px;
+}
+
+.category-table {
+  width: 40%;
+}
+
+.add-btn{
+  button{
+    width: 100%;
+  }
+}
+
+.tables {
+  padding-top: 10px;
+
+  .name {
+    border-bottom: 1px dotted #ccc;
+    cursor: pointer;
+
+  }
+
+  thead {
+    background: rgb(95, 155, 233);
+
+    tr {
+      color: white
+    }
+  }
+}
+
+.btn-action {
+  text-align: center;
 }
