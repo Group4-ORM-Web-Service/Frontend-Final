@@ -1,35 +1,62 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
-import { Drawer, Grid, Box, IconButton, Typography, Button } from '@mui/material';
+import { Drawer, Grid, Box, IconButton, Typography, Button, Alert } from '@mui/material';
 import { Add, Remove, Delete, Close } from '@mui/icons-material';
 import ImageTest from '../../images/iphone.png';
 import { useAppContext } from '../../context/AppContext';
-import { clearItems, removeItem, setOpenShopCard } from '../../store/actions/AppAction';
+import { clearItems, removeItem, setOpenShopCard, updateItem } from '../../store/actions/AppAction';
 import OrderForm from './FormInput';
+import apiClient from '../../api/axios';
+import { STORAGE_KEY } from '../../constant/keyComponent';
+import { calculatePrice } from '../../constant/publicFunctions';
 
 const ShopCardComponent = () => {
   const { appState, dispatchApp } = useAppContext();
   const [quantities, setQuantities] = useState(new Array(10).fill(1));
   const [isNext, setIsNext] = useState(false);
-  const pricePerItem = 10;
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const listItems = React.useMemo(() => appState?.items, [appState?.items]);
+  const totalPrice = React.useMemo(() => {
+    const items = appState?.items || [];
+    const total = items.reduce((acc, item) => acc + item?.total_price, 0);
+    return total.toFixed(2);
+  }, [appState?.items]);
+
+  const user = React.useMemo(() => {
+    const userData = JSON.parse(localStorage.getItem(STORAGE_KEY.USER_DATA));
+    return userData;
+  }, []);
 
   const handleIncrease = React.useCallback(
-    (index) => {
+    (item, index) => {
       const newQuantities = [...quantities];
       newQuantities[index] += 1;
       setQuantities(newQuantities);
+      dispatchApp(
+        updateItem({
+          ...item,
+          quantities: newQuantities[index],
+          total_price: calculatePrice(newQuantities[index], item?.product_price),
+        }),
+      );
     },
-    [quantities],
+    [dispatchApp, quantities],
   );
 
-  const handleDecrease = (index) => {
+  const handleDecrease = (item, index) => {
     const newQuantities = [...quantities];
     if (newQuantities[index] > 1) {
       newQuantities[index] -= 1;
+      setQuantities(newQuantities);
+      dispatchApp(
+        updateItem({
+          ...item,
+          quantities: newQuantities[index],
+          total_price: calculatePrice(newQuantities[index], item?.product_price),
+        }),
+      );
     }
-    setQuantities(newQuantities);
   };
 
   const handleRemove = React.useCallback(
@@ -50,15 +77,63 @@ const ShopCardComponent = () => {
 
   const handleNext = React.useCallback((status = true) => {
     setIsNext(status);
-    console.log('hello::', status);
+  }, []);
+
+  const onSuccess = React.useCallback(() => {
+    setIsSuccess(true);
+    setTimeout(() => {
+      setIsSuccess(false);
+    }, 1000);
   }, []);
 
   const handleSubmit = React.useCallback(() => {
-    console.log('submit::');
-  }, []);
+    const orderData = {
+      order: {
+        customer_id: user?.customer?.customer_id,
+      },
+      orderDetails: listItems?.map((item) => ({
+        product_id: item?.product_id,
+        variant_id: item?.variant_id,
+        quantity: item?.quantities,
+        product_price: item?.total_price,
+      })),
+      totalPrice,
+    };
+    if (user?.customer) {
+      apiClient
+        .post('/orders/add-order', orderData)
+        .then((response) => {
+          if (response?.data) {
+            console.log('Order successful:');
+            onSuccess();
+            dispatchApp(clearItems());
+            setIsNext(false);
+          } else {
+            console.log('Unexpected response format:');
+          }
+        })
+        .catch((error) => {
+          console.log('Error:', error?.response?.data?.message || error.message);
+        });
+    }
+  }, [dispatchApp, listItems, onSuccess, totalPrice, user?.customer]);
 
   return (
     <Drawer anchor='right' bg='grey.50' open={appState?.isOpenCard} onClose={handleCloseShopCard}>
+      {isSuccess && (
+        <Alert
+          severity='success'
+          style={{
+            position: 'absolute',
+            zIndex: 9999,
+            top: '16px',
+            width: '100%',
+          }}
+        >
+          Successfully submitted
+        </Alert>
+      )}
+
       {!isNext ? (
         <Box width={450} display='flex' flexDirection='column' height='100%'>
           <Box flexGrow={1} overflow='auto'>
@@ -69,7 +144,7 @@ const ShopCardComponent = () => {
               paddingBottom={1}
               position='sticky'
               top={0}
-              zIndex={9999}
+              zIndex={9990}
               bgcolor='grey.50'
               px='12px'
               boxShadow={2}
@@ -126,7 +201,7 @@ const ShopCardComponent = () => {
                     </Typography>
                     <Box display='flex' alignItems='center'>
                       <IconButton
-                        onClick={() => handleDecrease(index)}
+                        onClick={() => handleDecrease(item, index)}
                         disabled={quantities[index] <= 1}
                       >
                         <Remove sx={{ fontSize: 16 }} />
@@ -134,7 +209,7 @@ const ShopCardComponent = () => {
                       <Typography fontSize={13} variant='h6' paddingLeft={1} paddingRight={1}>
                         {quantities[index]}
                       </Typography>
-                      <IconButton onClick={() => handleIncrease(index)}>
+                      <IconButton onClick={() => handleIncrease(item, index)}>
                         <Add sx={{ fontSize: 16 }} />
                       </IconButton>
                       <IconButton onClick={() => handleRemove(item)}>
@@ -146,7 +221,7 @@ const ShopCardComponent = () => {
 
                 <Grid item xs={4}>
                   <Typography fontSize={15} variant='h6' align='center' color='blue.900'>
-                    ${parseFloat(quantities[index] * item?.product_price, 10)}
+                    ${item?.total_price}
                   </Typography>
                 </Grid>
               </Grid>
@@ -165,7 +240,7 @@ const ShopCardComponent = () => {
               <Grid item display='flex'>
                 <Typography variant='h6'>Total:</Typography>
                 <Typography variant='h6' mx='12px' fontWeight={600} color='blue.900'>
-                  ${quantities.reduce((total, qty) => total + qty * pricePerItem, 0)}
+                  ${totalPrice}
                 </Typography>
               </Grid>
               <Grid
@@ -193,7 +268,12 @@ const ShopCardComponent = () => {
           </Box>
         </Box>
       ) : (
-        <OrderForm onPrevious={handleNext} onClose={handleCloseShopCard} onSubmit={handleSubmit} />
+        <OrderForm
+          totalPrice={totalPrice}
+          onPrevious={handleNext}
+          onClose={handleCloseShopCard}
+          onSubmit={handleSubmit}
+        />
       )}
     </Drawer>
   );

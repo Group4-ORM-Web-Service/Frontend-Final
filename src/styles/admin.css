@@ -1,10 +1,11 @@
 .product-list {
-  display: flex;
-  justify-content: space-between;
+  /* display: flex;
+  flex-direction: 'column'; */
+  /* justify-content: space-between; */
 }
 
-.product-table{
-  width: 60%;
+.product-table {
+  width: 100%;
   padding-right: 15px;
 }
 
@@ -12,8 +13,8 @@
   width: 40%;
 }
 
-.add-btn{
-  button{
+.add-btn {
+  button {
     width: 100%;
   }
 }
@@ -24,14 +25,13 @@
   .name {
     border-bottom: 1px dotted #ccc;
     cursor: pointer;
-
   }
 
   thead {
-    background: rgb(95, 155, 233);
+    background: #0d47a1;
 
     tr {
-      color: white
+      color: white;
     }
   }
 }

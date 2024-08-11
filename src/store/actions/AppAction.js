@@ -4,6 +4,7 @@ export const SET_OPEN_SHOP_CARD = 'SET_OPEN_SHOP_CARD';
 export const AAD_ITEM_TOP_CARD = 'AAD_ITEM_TOP_CARD';
 export const CLEAR_ITEM_FROM_CARD = 'CLEAR_ITEM_FROM_CARD';
 export const REMOVE_ITEM = 'REMOVE_ITEM';
+export const UPDATE_ITEM = 'UPDATE_ITEM';
 
 // SET APP PAYLOAD ===========================================================
 export const setCurrentLocation = (payload) => ({
@@ -25,5 +26,9 @@ export const clearItems = (payload) => ({
 });
 export const removeItem = (payload) => ({
   type: REMOVE_ITEM,
+  payload,
+});
+export const updateItem = (payload) => ({
+  type: UPDATE_ITEM,
   payload,
 });

@@ -5,6 +5,7 @@ import {
   REMOVE_ITEM,
   SET_CURRENT_LOCATION,
   SET_OPEN_SHOP_CARD,
+  UPDATE_ITEM,
 } from '../actions/AppAction';
 
 // VARIABLE STORE APP STATE ========================================================
@@ -38,7 +39,18 @@ export const appReducer = (state, action) => {
         items: state.items.filter((item) => item.variant_id !== action.payload.variant_id),
       };
     }
-
+    case UPDATE_ITEM: {
+      const updatedItem = state.items.map((item) => {
+        if (item.variant_id === action.payload.variant_id) {
+          return { ...action.payload };
+        }
+        return { ...item };
+      });
+      return {
+        ...state,
+        items: updatedItem,
+      };
+    }
     default:
       return { ...state };
   }
