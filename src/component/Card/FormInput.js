@@ -1,9 +1,58 @@
 /* eslint-disable no-unused-vars */
-import React from 'react';
-import { TextField, Button, Grid, Typography, Box, Container, IconButton } from '@mui/material';
-import { ArrowBackIosNew, Close } from '@mui/icons-material';
+import React, { useState } from 'react';
+import {
+  TextField,
+  Button,
+  Grid,
+  Typography,
+  Box,
+  Container,
+  IconButton,
+  Autocomplete,
+} from '@mui/material';
+import { ArrowBackIosNew, Close, Email } from '@mui/icons-material';
 
-export default function OrderForm({ onPrevious, onClose, onSubmit }) {
+const yearlyData = ['2024', '2025', '2026', '2027', '2028', '2029', '2030'];
+const monthlyData = ['01', '02', '03', '04', '06', '07', '08', '09', '10', '11', '12'];
+
+export default function OrderForm({ totalPrice, onPrevious, onClose, onSubmit }) {
+  const [formData, setFormData] = useState({
+    email: '',
+    phone: '',
+    address: '',
+    cardName: '',
+    cardNumber: null,
+    monthly: '',
+    yearly: '',
+    cvv: '',
+  });
+
+  const handleChangeForm = React.useCallback(
+    (e) => {
+      const { name, value } = e.target;
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    },
+    [formData],
+  );
+
+  const handleSelect = React.useCallback(
+    (key, value) => {
+      setFormData({
+        ...formData,
+        [key]: value,
+      });
+    },
+    [formData],
+  );
+
+  const isValid = React.useMemo(() => {
+    const valid = Object.values(formData)?.every((v) => v !== '' && v !== null);
+    return valid;
+  }, [formData]);
+
   const handleSubmit = React.useCallback(() => {
     onSubmit();
   }, [onSubmit]);
@@ -23,28 +72,36 @@ export default function OrderForm({ onPrevious, onClose, onSubmit }) {
         </IconButton>
       </Grid>
       <Box component='form' px='16px'>
-        <Typography variant='h5' gutterBottom mt='32px'>
-          Contact Information
+        <Typography variant='h5' gutterBottom mt='32px' mb='32px'>
+          Information
         </Typography>
-
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField
-              required
               fullWidth
-              label='Name'
+              label='Email'
+              name='email'
               variant='outlined'
-              sx={{ display: 'none' }}
+              onChange={handleChangeForm}
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField fullWidth label='Email' variant='outlined' />
+            <TextField
+              fullWidth
+              label='Phone'
+              name='phone'
+              variant='outlined'
+              onChange={handleChangeForm}
+            />
           </Grid>
           <Grid item xs={12}>
-            <TextField fullWidth label='Phone' variant='outlined' />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField fullWidth label='Address' variant='outlined' />
+            <TextField
+              fullWidth
+              label='Address'
+              name='address'
+              variant='outlined'
+              onChange={handleChangeForm}
+            />
           </Grid>
         </Grid>
 
@@ -54,56 +111,53 @@ export default function OrderForm({ onPrevious, onClose, onSubmit }) {
 
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <TextField fullWidth label='Card Name' variant='outlined' />
+            <TextField
+              fullWidth
+              label='Card Name'
+              name='cardName'
+              variant='outlined'
+              onChange={handleChangeForm}
+            />
           </Grid>
           <Grid item xs={12}>
-            <TextField fullWidth label='Card Number xxxx-xxxx-xxxx-xxxx' variant='outlined' />
+            <TextField
+              fullWidth
+              label='Card Number xxxx-xxxx-xxxx-xxxx'
+              name='cardNumber'
+              variant='outlined'
+              onChange={handleChangeForm}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Autocomplete
+              id='yearly'
+              options={monthlyData}
+              disableCloseOnSelect={false}
+              getOptionLabel={(option) => option}
+              renderInput={(params) => <TextField {...params} label='monthly' />}
+              size='medium'
+              onChange={(event, value) => handleSelect('monthly', value)}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Autocomplete
+              id='monthly'
+              options={yearlyData}
+              disableCloseOnSelect={false}
+              getOptionLabel={(option) => option}
+              renderInput={(params) => <TextField {...params} label='yearly' />}
+              size='medium'
+              onChange={(event, value) => handleSelect('yearly', value)}
+            />
           </Grid>
           <Grid item xs={4}>
             <TextField
               fullWidth
-              select
-              label='Select Month'
+              label='CVV'
+              name='cvv'
               variant='outlined'
-              SelectProps={{
-                native: true,
-              }}
-            >
-              <option value=''></option>
-              <option value='01'>01</option>
-              <option value='02'>02</option>
-              <option value='03'>03</option>
-              <option value='04'>04</option>
-              <option value='05'>05</option>
-              <option value='06'>06</option>
-              <option value='07'>07</option>
-              <option value='08'>08</option>
-              <option value='09'>09</option>
-              <option value='10'>10</option>
-              <option value='11'>11</option>
-              <option value='12'>12</option>
-            </TextField>
-          </Grid>
-          <Grid item xs={4}>
-            <TextField
-              fullWidth
-              select
-              label='Select Year'
-              variant='outlined'
-              SelectProps={{
-                native: true,
-              }}
-            >
-              <option value=''></option>
-              <option value='2024'>2024</option>
-              <option value='2025'>2025</option>
-              <option value='2026'>2026</option>
-              <option value='2027'>2027</option>
-              <option value='2028'>2028</option>
-            </TextField>
-          </Grid>
-          <Grid item xs={4}>
-            <TextField fullWidth label='CVV' variant='outlined' />
+              onChange={handleChangeForm}
+            />
           </Grid>
         </Grid>
 
@@ -117,15 +171,19 @@ export default function OrderForm({ onPrevious, onClose, onSubmit }) {
             alignSelf: 'center',
           }}
         >
+          <Typography fontSize='18px' fontWeight='600' my='16px' color='blue.900'>
+            Total Price: ${totalPrice}
+          </Typography>
           <Button
             fullWidth
-            size="large"
+            size='large'
             variant='contained'
             color='success'
             sx={{ backgroundColor: 'blue.900', color: '#fff' }}
             onClick={handleSubmit}
+            disabled={!isValid}
           >
-            250$ Submit
+            Submit
           </Button>
         </Box>
       </Box>

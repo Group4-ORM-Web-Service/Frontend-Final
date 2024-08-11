@@ -19,7 +19,8 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const logout = React.useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY.USER_TOKEN);
+    // localStorage.removeItem(STORAGE_KEY.USER_TOKEN);
+    localStorage.clear();
     setIsAuthenticated(false);
   }, []);
 

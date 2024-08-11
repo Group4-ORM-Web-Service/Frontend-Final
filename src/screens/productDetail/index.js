@@ -1,18 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
-import {
-  Grid,
-  Card,
-  CardMedia,
-  CardContent,
-  Typography,
-  Button,
-  Rating,
-  Chip,
-  Stack,
-  ButtonBase,
-  Box,
-} from '@mui/material';
+import { Grid, CardMedia, CardContent, Typography, Button, Rating, Box } from '@mui/material';
 import { ShoppingCart, LocalOffer } from '@mui/icons-material';
 import Sidebar from '../../layouts/sidebar';
 import ProductVariant from './components/ProductVariant';
@@ -33,8 +21,21 @@ const ProductDetailPage = () => {
   }, []);
 
   const addToCard = React.useCallback(() => {
-    dispatchApp(addItemToCard({ ...selectedItem, product_name: product?.product_name }));
-  }, [dispatchApp, product?.product_name, selectedItem]);
+    const variantExists = appState?.items.some(
+      (item) => item.variant_id === selectedItem?.variant_id,
+    );
+    if (!variantExists) {
+      dispatchApp(
+        addItemToCard({
+          ...selectedItem,
+          product_name: product?.product_name,
+          product_id: product?.product_id,
+          quantities: 1,
+          total_price: selectedItem?.product_price,
+        }),
+      );
+    }
+  }, [appState?.items, dispatchApp, product?.product_id, product?.product_name, selectedItem]);
 
   useEffect(() => {
     if (item) {
@@ -46,7 +47,14 @@ const ProductDetailPage = () => {
   return (
     <>
       <Sidebar pageName='ProductDetail' />
-      <Grid container spacing={4} py='32px' px='32px' bgcolor='grey.50' height={window.innerHeight}>
+      <Grid
+        container
+        spacing={4}
+        py='32px'
+        px='32px'
+        bgcolor='grey.50'
+        minHeight={window.innerHeight}
+      >
         <Grid item xs={12} sm={6} bgcolor='grey.50'>
           <Box bgcolor='grey.50'>
             <LocalOffer color='info' />

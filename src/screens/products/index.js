@@ -25,6 +25,23 @@ const ProductPage = () => {
 
   const [listItems, setListItems] = React.useState([]);
 
+  const handleFilterCategory = React.useState((category) => {
+    apiClient
+      .get(`/products/category_id/${category}`)
+      .then((response) => {
+        if (response?.data) {
+          const products = response?.data?.result?.products;
+          setListItems([...products]);
+          console.log('Get products successful:', products?.length);
+        } else {
+          console.log('Unexpected response format:');
+        }
+      })
+      .catch((error) => {
+        console.log('Error:', error?.response?.data?.message || error.message);
+      });
+  }, []);
+
   useEffect(() => {
     const catId = category?.category_id;
     const endpoint = catId ? `/products/category_id/${catId}` : '/products?page=1&limit=500';
