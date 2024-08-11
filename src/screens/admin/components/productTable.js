@@ -1,93 +1,112 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from "react";
+import apiClient from '../../../api/axios';
 import Button from '@mui/material/Button';
 import { Box } from '@mui/material';
 import '../../../styles/admin.css';
 
 
 const ProductTable = () => {
+
+  const [productData, setProductData] = useState([]);
+  const fetchProducts = useCallback(() => {
+    apiClient
+      .get('/products?page=1&limit=500')
+      .then((response) => {
+        if (response?.data) {
+          const products = response?.data?.products;
+          setProductData([...products]);
+          console.log('Get products successful:', products?.length);
+        } else {
+          console.log('Unexpected response format:');
+        }
+      })
+      .catch((error) => {
+        console.log('Error:', error?.response?.data?.message || error.message);
+      });
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  const removeFunction = (id) => {
+    const confirmed = window.confirm('Do you want to remove?');
+    if (confirmed) {
+      apiClient.delete(`/products/remove-product-by/${id}`)
+        .then((response) => {
+          if (response?.data) {
+            fetchProducts();
+          }
+        })
+        .catch(err => console.log(err));
+    }
+  }
+
   return (
     <>
-        <div className='product-table'>
-          <h2>Product</h2>
-          <div className='tables'>
-            <table className='table  table-striped table-bordered table-hover table-checkable order-column dataTable'>
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>Product Name</th>
-                  <th>Description</th>
-                  <th className='btn-action'>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>Desktop</td>
-                  <td>
-                    <span className='name'>Titanuim streak wedding band</span>
-                  </td>
-                  <td className='btn-action'>
-                    <button type='button' className='btn btn-danger'>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>1</td>
-                  <td>Desktop</td>
-                  <td>
-                    <span className='name'>Titanuim streak wedding band</span>
-                  </td>
-                  <td className='btn-action'>
-                    <button type='button' className='btn btn-danger'>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>1</td>
-                  <td>Desktop</td>
-                  <td>
-                    <span className='name'>Titanuim streak wedding band</span>
-                  </td>
-                  <td className='btn-action'>
-                    <button type='button' className='btn btn-danger'>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Button
-              variant='contained'
-              sx={{
-                m: 2,
-                width: {
-                  xs: '100%',
-                },
-                height: '7ch',
-              }}
-            >
-              ADD NEW PRODUCT
-            </Button>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Button
-              variant='contained'
-              sx={{
-                m: 2,
-                width: {
-                  xs: '100%',
-                },
-                height: '7ch',
-              }}
-            >
-              DELETE SELECTED PRODUCT
-            </Button>
-          </Box>
+      <div className='product-table'>
+        <h2>Product</h2>
+        <div className='tables'>
+          <table className='table  table-striped table-bordered table-hover table-checkable order-column dataTable'>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Product Name</th>
+                <th>Description</th>
+                <th className='btn-action'>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                productData.map((product, i) => (
+                  <tr key={i}>
+                    <td>{i + 1}</td>
+                    <td>{product.product_name}</td>
+                    <td>
+                      <span className='name'>{product.description}</span>
+                    </td>
+                    <td className='btn-action'>
+                      <button type='button' className='btn btn-danger' onClick={() => { removeFunction(product.product_id) }}>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+
+              }
+
+            </tbody>
+          </table>
         </div>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Button
+            variant='contained'
+            sx={{
+              m: 2,
+              width: {
+                xs: '100%',
+              },
+              height: '7ch',
+            }}
+          >
+            ADD NEW PRODUCT
+          </Button>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Button
+            variant='contained'
+            sx={{
+              m: 2,
+              width: {
+                xs: '100%',
+              },
+              height: '7ch',
+            }}
+          >
+            DELETE SELECTED PRODUCT
+          </Button>
+        </Box>
+      </div>
     </>
   );
 };
