@@ -5,6 +5,7 @@ import HomePage from '../screens/home';
 import AdminPage from '../screens/admin/index';
 import ProductDetailPage from '../screens/productDetail/index';
 import ProductPage from '../screens/products';
+import UserProfile from '../screens/userProfile';
 import React from 'react';
 import ProtectedRoute from './ProtectedRoute';
 import { ROUTES_NAME } from '../constant/keyComponent';
@@ -22,6 +23,7 @@ const RouteContainer = () => {
           <Route path={ROUTES_NAME.HOME} element={<HomePage />} />
           <Route path={ROUTES_NAME.PRODUCTS} element={<ProductPage />} />
           <Route path={ROUTES_NAME.PRODUCT_DETAIL} element={<ProductDetailPage />} />
+          <Route path={ROUTES_NAME.ACCOUNT} element={<UserProfile />} />
           <Route path={ROUTES_NAME.ADMIN} element={<AdminPage />}>
             <Route path='product' element={<AdminPage />} />
           </Route>
