@@ -56,19 +56,30 @@ const ProductDetailPage = () => {
         minHeight={window.innerHeight}
       >
         <Grid item xs={12} sm={6} bgcolor='grey.50'>
+          <LocalOffer color='info' />
           <Box bgcolor='grey.50'>
-            <LocalOffer color='info' />
-            <CardMedia
+            <img
+              src={selectedItem?.imageUrl}
+              alt={selectedItem?.product_name}
+              style={{
+                backgroundColor: '#fafafa',
+                boxSizing: 'border-box',
+                height: '600px',
+              }}
+            />
+            {/* <CardMedia
               component='img'
-              height='500'
+              // height='500'
+              // height='500'
               image={selectedItem?.imageUrl}
               sizes={500}
+              // sizes='auto'
               alt={product?.product_name}
               style={{
                 backgroundColor: '#fafafa',
                 boxSizing: 'border-box',
               }}
-            />
+            /> */}
             <Grid container spacing={2} sx={{ mt: 4, ml: '8px' }}>
               {(product?.productVariants || [])?.map((variant, index) => (
                 <ProductVariant

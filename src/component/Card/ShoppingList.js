@@ -184,6 +184,7 @@ const ShopCardComponent = () => {
                 borderTop={1}
                 borderBottom={1}
                 borderColor='#f1f1f1'
+                px='16px'
               >
                 <Grid item xs={4}>
                   <Box
