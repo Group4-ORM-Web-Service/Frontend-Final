@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import apiClient from '../../../api/axios';
 import { Box } from '@mui/material';
 import '../../../styles/admin.css';
+import ProductForm from './AddProductForm';
+import { orderBy } from 'lodash';
 
 const ProductTable = () => {
   const [productData, setProductData] = useState([]);
@@ -10,7 +12,7 @@ const ProductTable = () => {
       .get('/products?page=1&limit=500')
       .then((response) => {
         if (response?.data) {
-          const products = response?.data?.products;
+          const products = orderBy(response?.data?.products, [(item) => item?.createdAt], ['desc']);
           setProductData([...products]);
           console.log('Get products successful:', products?.length);
         } else {
@@ -42,6 +44,7 @@ const ProductTable = () => {
 
   return (
     <Box width='100%' mt='32px' px='16px'>
+      <ProductForm fetchProducts={fetchProducts} />
       <div className='product-table'>
         <div className='tables'>
           <table className='table  table-striped table-bordered table-hover table-checkable order-column dataTable'>

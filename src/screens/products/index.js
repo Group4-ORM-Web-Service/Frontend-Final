@@ -6,6 +6,7 @@ import Sidebar from '../../layouts/sidebar';
 import { Box, Typography } from '@mui/material';
 import apiClient from '../../api/axios';
 import { useLocation } from 'react-router-dom';
+import { orderBy } from 'lodash';
 
 const ProductPage = () => {
   const location = useLocation();
@@ -50,7 +51,8 @@ const ProductPage = () => {
       .then((response) => {
         if (response?.data) {
           const products = catId ? response?.data?.result?.products : response?.data?.products;
-          setListItems([...products]);
+          const sortedProducts = orderBy(products, [(item) => item?.createdAt], ['desc']);
+          setListItems([...sortedProducts]);
           console.log('Get products successful:', products?.length);
         } else {
           console.log('Unexpected response format:');

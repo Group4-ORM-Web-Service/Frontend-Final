@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+/* eslint-disable no-unused-vars */
+import React, { useEffect, useState } from 'react';
 import {
   TextField,
   Button,
@@ -15,26 +16,31 @@ import {
   Autocomplete,
 } from '@mui/material';
 import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
+import apiClient from '../../../api/axios';
+import { orderBy } from 'lodash';
 
-const ProductForm = () => {
+const defaultProduct = {
+  category_id: '',
+  product_name: '',
+  description: '',
+  imageUrl: '',
+  variants: [
+    {
+      supplier_id: '',
+      product_price: '',
+      size: '',
+      color: '',
+      sku: '',
+      barcode: '',
+      imageUrl: '',
+    },
+  ],
+};
+const ProductForm = ({ fetchProducts }) => {
   const [openModal, setOpenModal] = useState(false);
-  const [product, setProduct] = useState({
-    category_id: '',
-    product_name: '',
-    description: '',
-    imageUrl: '',
-    variants: [
-      {
-        supplier_id: '',
-        product_price: '',
-        size: '',
-        color: '',
-        sku: '',
-        barcode: '',
-        imageUrl: '',
-      },
-    ],
-  });
+  const [suppliers, setSuppliers] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [product, setProduct] = useState(defaultProduct);
 
   const handleOpen = React.useCallback(() => {
     setOpenModal(!openModal);
@@ -44,6 +50,25 @@ const ProductForm = () => {
     (e) => {
       const { name, value } = e.target;
       setProduct({ ...product, [name]: value });
+    },
+    [product],
+  );
+
+  const handleSelectCategory = React.useCallback(
+    (event, value) => {
+      const categoryId = value?.category_id;
+      setProduct({ ...product, ['category_id']: categoryId });
+    },
+    [product],
+  );
+
+  const handleSelectSupplier = React.useCallback(
+    (index, value) => {
+      console.log;
+      const supplierId = value?.supplier_id;
+      const newVariants = [...product.variants];
+      newVariants[index] = { ...newVariants[index], ['supplier_id']: supplierId };
+      setProduct({ ...product, variants: newVariants });
     },
     [product],
   );
@@ -87,11 +112,76 @@ const ProductForm = () => {
   const handleSubmit = React.useCallback(
     (e) => {
       e.preventDefault();
+      // console.log('product==>', JSON.stringify(product));
+      const { category_id, product_name, description, imageUrl } = product;
+      const { variants } = product;
+
+      const productForm = {
+        product: {
+          category_id,
+          product_name,
+          description,
+          imageUrl,
+        },
+        variants,
+      };
+      apiClient
+        .post('/products/add-product', productForm)
+        .then((response) => {
+          if (response?.data) {
+            fetchProducts();
+            handleOpen();
+            setProduct(defaultProduct);
+          }
+        })
+        .catch((error) => {
+          console.log('Error:', error?.response?.data?.message || error.message);
+        });
       console.log('Product Data:', product);
-      handleOpen();
     },
-    [handleOpen, product],
+    [fetchProducts, handleOpen, product],
   );
+
+  const fetchCategories = React.useCallback(() => {
+    apiClient
+      .get('/categories?page=1&limit=500')
+      .then((response) => {
+        if (response?.data) {
+          const sortedCategories = orderBy(
+            response.data?.categories,
+            [(item) => item?.createdAt],
+            ['desc'],
+          );
+          setCategories(sortedCategories);
+        }
+      })
+      .catch((error) => {
+        console.log('Error:', error?.response?.data?.message || error.message);
+      });
+  }, []);
+
+  const fetchSuppliers = React.useCallback(() => {
+    apiClient
+      .get('/suppliers?page=1&limit=500')
+      .then((response) => {
+        if (response?.data) {
+          const sortedSuppliers = orderBy(
+            response.data?.suppliers,
+            [(item) => item?.createdAt],
+            ['desc'],
+          );
+          setSuppliers(sortedSuppliers);
+        }
+      })
+      .catch((error) => {
+        console.log('Error:', error?.response?.data?.message || error.message);
+      });
+  }, []);
+
+  useEffect(() => {
+    fetchCategories();
+    fetchSuppliers();
+  }, [fetchCategories, fetchSuppliers]);
 
   return (
     <div>
@@ -117,22 +207,14 @@ const ProductForm = () => {
           <Paper style={{ padding: 16 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                {/* <TextField
-                  label='Category ID'
-                  name='category_id'
-                  value={product.category_id}
-                  onChange={handleChangeProduct}
-                  fullWidth
-                  size='small'
-                /> */}
                 <Autocomplete
-                  id='supplier'
-                  options={[]}
+                  id='category'
+                  options={categories || []}
                   disableCloseOnSelect={false}
-                  getOptionLabel={(option) => `${option?.country || option}`}
-                  renderInput={(params) => <TextField {...params} label='supplier' />}
+                  getOptionLabel={(option) => option?.category_name}
+                  renderInput={(params) => <TextField {...params} label='category' />}
                   size='small'
-                  onChange={handleChangeProduct}
+                  onChange={handleSelectCategory}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -177,22 +259,17 @@ const ProductForm = () => {
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
-                      {/* <TextField
-                        label='Supplier ID'
-                        name='supplier_id'
-                        value={variant.supplier_id}
-                        onChange={(e) => handleChangeVariant(index, e)}
-                        fullWidth
-                        size='small'
-                      /> */}
                       <Autocomplete
                         id='supplier'
-                        options={[]}
+                        options={suppliers || []}
                         disableCloseOnSelect={false}
-                        getOptionLabel={(option) => `${option?.country || option}`}
+                        // value={product.variants[index].supplier_id}
+                        getOptionLabel={(option) =>
+                          `${option?.supplier_name}-${option?.city}-${option?.country}`
+                        }
                         renderInput={(params) => <TextField {...params} label='supplier' />}
                         size='small'
-                        onChange={(e) => handleChangeVariant(index, e)}
+                        onChange={(e, value) => handleSelectSupplier(index, value)}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
