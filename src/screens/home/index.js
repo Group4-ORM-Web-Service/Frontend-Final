@@ -61,12 +61,12 @@ const HomePage = () => {
 
   useEffect(() => {
     apiClient
-      .get('/categories')
+      .get('/categories?page=1&limit=500')
       .then((response) => {
         if (response?.data) {
           const categories = orderBy(
             response.data?.categories,
-            [(item) => item?.category_id],
+            [(item) => item?.createdAt],
             ['desc'],
           );
           setCategories(categories);

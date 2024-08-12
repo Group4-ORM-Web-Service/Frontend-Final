@@ -12,7 +12,6 @@ const AdminPage = () => {
     <Box bgcolor='grey.50' minHeight={window.innerHeight - 32}>
       <Sidebar pageName='Admin' />
       <Box className='product-list' style={{ paddingLeft: 16, paddingRight: 16, marginTop: 50 }}>
-        <ProductForm />
         <ProductTable />
         {/* <CateogryTable /> */}
       </Box>
